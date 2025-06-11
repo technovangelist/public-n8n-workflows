@@ -1,0 +1,996 @@
+{
+  "name": "n8n backup",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-320, -440],
+      "id": "193d836b-d868-45ef-9a09-e138f226392b",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $('WF Config').first().json.localpath }}/{{ $('Convert WF to File').item.binary.binary.fileName }}.json",
+        "dataPropertyName": "binary",
+        "options": {
+          "append": false
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [1280, -80],
+      "id": "75bccedb-2b64-4e8e-abc0-6e1a50f61a29",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "filters": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [1180, -360],
+      "id": "f5ab3e3c-9916-4920-a46d-d8cf700be76b",
+      "name": "Get all workflows",
+      "executeOnce": true,
+      "credentials": {
+        "n8nApi": {
+          "id": "nurXosqzoSOemEzc",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6be01af9-448f-4e5e-b7aa-a405dd56ffb2",
+              "leftValue": "={{ $('Local Repo Exists').first().json}}",
+              "rightValue": 0,
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [220, -340],
+      "id": "52ef6095-10d0-4f97-a184-d009350f4e78",
+      "name": "If folder is empty"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('file diffs').item.json.diff }}",
+        "options": {
+          "systemMessage": "=You are an expert developer of n8n workflows, so you know how to read n8n workflow json files and understand the nodes that make up the workflow..\n\nRead the git patch diff calmly from top to bottom, paying attention to each addition, deletion, and unchanged line carefully. ignore changes in dates and locations, but do identify new workflows and nodes in existing workflows added. Focus on changes, not only the last or first lines, and figure out the main idea of the input. If complex, break it down into smaller parts to organize your thoughts.\nWrite a commit message based on the git diff provided. Read the diff below and write a commit message that accurately describes the changes made. Try to make sure you describe why instead of what on your description message.\nYour message is to add a kind of explanation for future consulting, so be clear and concise.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [3020, -300],
+      "id": "cc27de21-bf39-4c0e-8fcd-7ace3b22c524",
+      "name": "AI Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": "tavernari/git-commit-message:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [2980, -140],
+      "id": "d19b773a-f6af-4c61-9b5f-2316bf5d71e2",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "bFTQGanjtPHDeMn7",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [1720, -340],
+      "id": "40c03a35-6178-4ab4-8d86-e440d25236ae",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5bb44f63-5e57-4084-bf17-d5572143c66c",
+              "name": "filename",
+              "value": "={{ $json.name }}.json",
+              "type": "string"
+            },
+            {
+              "id": "e6115ffe-e7a7-433c-a079-196b342d3cfa",
+              "name": "diff",
+              "value": "={{ $json.stdout }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1980, -340],
+      "id": "5876cc79-4b51-45fc-a2e2-09e7742426c2",
+      "name": "file diffs"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d43fbceb-984c-4259-99cb-724ac342b298",
+              "leftValue": "={{ $json.diff.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [2140, -340],
+      "id": "17139c99-5cce-4283-8bac-262553a2022d",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [2380, -340],
+      "id": "e60c8116-17fb-48ae-b431-0a6cc82bbccf",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 4
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [-320, -260],
+      "id": "4e46964b-ee8c-4bd6-9943-a6d836385d15",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "authentication": "gitPassword",
+        "operation": "clone",
+        "repositoryPath": "={{ $('WF Config').item.json.localpath }}",
+        "sourceRepository": "=https://github.com/{{ $('WF Config').item.json.reponame }}"
+      },
+      "type": "n8n-nodes-base.git",
+      "typeVersion": 1,
+      "position": [400, -560],
+      "id": "6ee45104-23c3-453b-8530-6b3bdfa492be",
+      "name": "Git Clone",
+      "credentials": {
+        "gitPassword": {
+          "id": "yftN50MbfTfjqUcO",
+          "name": "Git account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=cd {{ $('WF Config').first().json.localpath }};\ngit diff \"{{ $('Get all workflows').item.json.name }}.json\";"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1500, -80],
+      "id": "a0ac90c0-fdcd-4dae-88b1-8c96c38490bf",
+      "name": "Generate a Diff for the file",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2563b57b-ce70-45b4-aca7-14105ac33cf8",
+              "name": "reponame",
+              "value": "enter your org/repo name",
+              "type": "string"
+            },
+            {
+              "id": "e9c96f8e-5438-4927-9490-b54dcf418cdd",
+              "name": "localpath",
+              "value": "/files/wfbackup",
+              "type": "string"
+            },
+            {
+              "id": "38694fc4-3ef7-4e62-8e23-a839210415e2",
+              "name": "username",
+              "value": "ubuntu",
+              "type": "string"
+            },
+            {
+              "id": "f0e751dd-68a5-4c49-a3d0-f335229fde2f",
+              "name": "useremail",
+              "value": "your email used on github",
+              "type": "string"
+            },
+            {
+              "id": "1f55ec85-4924-4b6c-a652-c8c4a249c006",
+              "name": "filterjsondiff",
+              "value": "/files/n8njsondiff.js",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-100, -340],
+      "id": "23981c50-6cc7-4bb4-986d-3a84f801a0a8",
+      "name": "WF Config"
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $json.localpath }}/*.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [40, -340],
+      "id": "56af38cd-9f5e-485f-85b5-68f2beba7578",
+      "name": "Local Repo Exists",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "add",
+        "repositoryPath": "={{ $('WF Config').first().json.localpath }}",
+        "pathsToAdd": "={{ $json.filename }}"
+      },
+      "type": "n8n-nodes-base.git",
+      "typeVersion": 1,
+      "position": [2660, -300],
+      "id": "20550f6e-48f0-4af7-b151-bc5994421faf",
+      "name": "Git Add File",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "authentication": "gitPassword",
+        "operation": "push",
+        "repositoryPath": "={{ $('WF Config').first().json.localpath }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.git",
+      "typeVersion": 1,
+      "position": [3420, -500],
+      "id": "7eae92c5-09af-40e6-a557-cb5ded2e16a6",
+      "name": "Git Push",
+      "executeOnce": true,
+      "credentials": {
+        "gitPassword": {
+          "id": "yftN50MbfTfjqUcO",
+          "name": "Git account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "commit",
+        "repositoryPath": "={{ $('WF Config').first().json.localpath }}",
+        "message": "={{ $('Loop Over Items').item.json.filename }} - {{ $json.response }}",
+        "options": {
+          "pathsToAdd": ""
+        }
+      },
+      "type": "n8n-nodes-base.git",
+      "typeVersion": 1,
+      "position": [3600, -180],
+      "id": "93a59219-fccd-46e6-bc31-bd9f7e064447",
+      "name": "Git Commit Files"
+    },
+    {
+      "parameters": {
+        "command": "=cd {{ $('WF Config').first().json.localpath }};\ngit ls-tree -r --name-only HEAD\n"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1020, -360],
+      "id": "e191b3a3-508e-4b33-a80a-4eec7ac7d62a",
+      "name": "Get Current Files"
+    },
+    {
+      "parameters": {
+        "jsCode": "const currentwf = $(\"Get all workflows\").all().map(w => w.json.name);\nconsole.log('Current WF: ' + currentwf)\nconst currentWFSet = new Set(currentwf);\nconst allFiles = $(\"Get Current Files\").first().json.stdout.split('\\n').map(i=>i.replace(/\\.json$/i, ''));\nconsole.log('All Files in Repo: ' + allFiles)\n  \nconst allFilesSet = new Set(allFiles);\n\nconst newwf = currentwf.filter(item => !allFilesSet.has(item))\nconst deletedwf = allFiles.filter(item=> !currentWFSet.has(item))\nreturn [{\"type\": \"new\", \"files\": newwf}, {\"type\": \"deleted\", \"files\": deletedwf}]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1960, -680],
+      "id": "ac5aa954-5ea1-413e-b8c7-2f395d3db088",
+      "name": "New and Deleted WF"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "new",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "32528e5f-177a-4fe1-8ab0-4ce3e41fffd9"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "New WF"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c5149bef-e712-4caf-8bb0-866fd84b11a7",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "deleted",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Deleted WF"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [2140, -680],
+      "id": "aee5b4df-abee-4721-a62e-59f489a2d92c",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=files",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [2360, -860],
+      "id": "58cffdb3-6ba3-47c2-a2b2-eb630c7746fb",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "add",
+        "repositoryPath": "={{ $('WF Config').first().json.localpath }}",
+        "pathsToAdd": "={{ $json.files }}.json"
+      },
+      "type": "n8n-nodes-base.git",
+      "typeVersion": 1,
+      "position": [2560, -860],
+      "id": "64e809fc-6142-493b-9909-5dac7487e299",
+      "name": "Git Add"
+    },
+    {
+      "parameters": {
+        "operation": "commit",
+        "repositoryPath": "={{ $('WF Config').first().json.localpath }}",
+        "message": "=Added New Workflow",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.git",
+      "typeVersion": 1,
+      "position": [2780, -860],
+      "id": "cd459367-936e-486f-9cb1-04d050230c8d",
+      "name": "Git Commit"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [3140, -500],
+      "id": "a495b21d-d75c-42d9-a0ee-191f6f6442c7",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=files",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [2360, -680],
+      "id": "ea1f68c6-c1b5-4f2d-b3a1-753ac156917a",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "operation": "commit",
+        "repositoryPath": "={{ $('WF Config').first().json.localpath }}",
+        "message": "Deleted WF",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.git",
+      "typeVersion": 1,
+      "position": [2780, -680],
+      "id": "97a22c60-f428-4eb0-baf8-d69f61bb5ae0",
+      "name": "Git"
+    },
+    {
+      "parameters": {
+        "command": "=cd {{ $('WF Config').first().json.localpath }};\ngit rm \"{{ $('Split Out1').item.json.files }}.json\""
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [2560, -680],
+      "id": "de6ea656-138d-4604-8856-4119da70d5a1",
+      "name": "Git rm deleted wf"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "binaryPropertyName": "binary",
+        "options": {
+          "format": true,
+          "encoding": "utf8",
+          "fileName": "={{ $('Get all workflows').item.json.name }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [1100, -80],
+      "id": "4c5a0f0f-83f7-4a42-bc59-9b4acfa88f74",
+      "name": "Convert WF to File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6442139e-eca0-47ec-92c4-416831c316e8",
+              "name": "model",
+              "value": "=tavernari/git-commit-message",
+              "type": "string"
+            },
+            {
+              "id": "268dc8a7-8395-480e-b6b3-612b5feb28b4",
+              "name": "stream",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "7c7b114a-f5a5-4c2d-9d51-2ed5c070aff4",
+              "name": "system",
+              "value": "You are an expert developer, so you know how to read all kinds of code syntax.\\n\\nRead the git patch diff calmly from top to bottom, paying attention to each addition, deletion, and unchanged line carefully. Focus on changes, not only the last or first lines, and figure out the main idea of the input. If complex, break it down into smaller parts to organize your thoughts.\\nWrite a commit message based on the git diff provided. Read the diff below and write a commit message that accurately describes the changes made. Focus in write why instead of what on your description message.\\nYour message is to add a kind of explanation for future consulting, so be clear and concise.\\n",
+              "type": "string"
+            },
+            {
+              "id": "fa18d933-f069-4826-b7ca-ae882b4d18ce",
+              "name": "prompt",
+              "value": "={{ $('Loop Over Items').item.json.diff }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [2840, -300],
+      "id": "247e46da-1bab-4d7f-a7e6-b6e45dcfdb74",
+      "name": "Set ollama json"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://yourollamahost:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Set ollama json').item.json }}",
+        "options": {
+          "timeout": 600000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3360, -300],
+      "id": "d44031e7-6f2e-4c70-b7ba-e759cee2ca90",
+      "name": "Local AI Agent"
+    },
+    {
+      "parameters": {
+        "command": "=cat > \"{{ $('WF Config').item.json.filterjsondiff }}\" << 'EOF'\n#!/usr/bin/env node\n\nconst fs = require('fs');\nconst path = process.argv[2];\n\nlet content = fs.readFileSync(path, 'utf8');\n\n// Remove createdAt/updatedAt timestamps\ncontent = content.replace(/\"createdAt\":\\s*\"[^\"]*\"/g, '\"createdAt\": \"REMOVED\"');\ncontent = content.replace(/\"updatedAt\":\\s*\"[^\"]*\"/g, '\"updatedAt\": \"REMOVED\"');\n\n// Remove position values\ncontent = content.replace(/\"position\":\\s*\\[\\s*-?\\d+\\s*,\\s*-?\\d+\\s*\\]/g, '\"position\": [0,0]');\n\n// Standardize version IDs\ncontent = content.replace(/\"versionId\":\\s*\"[^\"]*\"/g, '\"versionId\": \"REMOVED\"');\n\nprocess.stdout.write(content);\nEOF\n\n# Make the script executable\nchmod +x \"{{ $('WF Config').item.json.filterjsondiff }}\";\n\ncat > \"{{ $('WF Config').item.json.localpath }}/.gitattributes\" << 'EOF'\n*.json diff=n8njson\nEOF\n\ncd {{ $('WF Config').item.json.localpath }};\ngit config --local diff.n8njson.textconv \"{{ $('WF Config').item.json.filterjsondiff }}\";\n\n\n"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [760, -560],
+      "id": "531c7bee-2527-41e4-80cd-e1f1162a64d9",
+      "name": "create json diff filter"
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=cd {{ $('WF Config').first().json.localpath }};\ngit config user.email {{ $('WF Config').first().json.useremail }};\ngit config user.name {{ $('WF Config').first().json.username }};\n"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [560, -560],
+      "id": "64d50a87-24ed-4002-91e3-95c7efb2dee0",
+      "name": "Set Config"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "WF Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all workflows": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Convert WF to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If folder is empty": {
+      "main": [
+        [
+          {
+            "node": "Git Clone",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Current Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Generate a Diff for the file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Local AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "file diffs",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "New and Deleted WF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "file diffs": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 2
+          }
+        ],
+        [
+          {
+            "node": "Git Add File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "WF Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Git Clone": {
+      "main": [
+        [
+          {
+            "node": "Set Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate a Diff for the file": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "WF Config": {
+      "main": [
+        [
+          {
+            "node": "Local Repo Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Local Repo Exists": {
+      "main": [
+        [
+          {
+            "node": "If folder is empty",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Git Add File": {
+      "main": [
+        [
+          {
+            "node": "Set ollama json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Git Commit Files": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Current Files": {
+      "main": [
+        [
+          {
+            "node": "Get all workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New and Deleted WF": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Git Add",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Git Add": {
+      "main": [
+        [
+          {
+            "node": "Git Commit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Git Commit": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Git Push",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Git rm deleted wf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Git": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Git rm deleted wf": {
+      "main": [
+        [
+          {
+            "node": "Git",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert WF to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set ollama json": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Local AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Git Commit Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create json diff filter": {
+      "main": [
+        [
+          {
+            "node": "Get Current Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Config": {
+      "main": [
+        [
+          {
+            "node": "create json diff filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "IXj0f1Q7d0p4vuOm"
+  },
+  "versionId": "939f6c1a-a2b5-4895-b1b2-2e93e17734f6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "83c60a09e35cb68395a4ed1679d472b64eafc534f4e7a5dab9654404b05e6885"
+  },
+  "id": "X55I8ECJxRUrXSAO",
+  "tags": []
+}
