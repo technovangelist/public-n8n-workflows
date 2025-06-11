@@ -2,7 +2,7 @@
 
 # Backup
 
-[n8n Backup](n8nBackup.json)
+[n8n Backup](https://raw.githubusercontent.com/technovangelist/public-n8n-workflows/refs/heads/main/n8nBackup.json)
 
 
 ![](backup.png)
