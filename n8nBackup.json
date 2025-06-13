@@ -5,7 +5,10 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [-320, -440],
+      "position": [
+        -320,
+        -440
+      ],
       "id": "193d836b-d868-45ef-9a09-e138f226392b",
       "name": "When clicking ‘Test workflow’"
     },
@@ -20,7 +23,10 @@
       },
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
-      "position": [1280, -80],
+      "position": [
+        1280,
+        -80
+      ],
       "id": "75bccedb-2b64-4e8e-abc0-6e1a50f61a29",
       "name": "Read/Write Files from Disk"
     },
@@ -31,7 +37,10 @@
       },
       "type": "n8n-nodes-base.n8n",
       "typeVersion": 1,
-      "position": [1180, -360],
+      "position": [
+        1180,
+        -360
+      ],
       "id": "f5ab3e3c-9916-4920-a46d-d8cf700be76b",
       "name": "Get all workflows",
       "executeOnce": true,
@@ -69,7 +78,10 @@
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [220, -340],
+      "position": [
+        220,
+        -340
+      ],
       "id": "52ef6095-10d0-4f97-a184-d009350f4e78",
       "name": "If folder is empty"
     },
@@ -83,7 +95,10 @@
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.9,
-      "position": [3020, -300],
+      "position": [
+        3020,
+        -300
+      ],
       "id": "cc27de21-bf39-4c0e-8fcd-7ace3b22c524",
       "name": "AI Agent",
       "disabled": true
@@ -95,7 +110,10 @@
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
       "typeVersion": 1,
-      "position": [2980, -140],
+      "position": [
+        2980,
+        -140
+      ],
       "id": "d19b773a-f6af-4c61-9b5f-2316bf5d71e2",
       "name": "Ollama Chat Model",
       "credentials": {
@@ -113,7 +131,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.1,
-      "position": [1720, -340],
+      "position": [
+        1720,
+        -340
+      ],
       "id": "40c03a35-6178-4ab4-8d86-e440d25236ae",
       "name": "Merge"
     },
@@ -139,7 +160,10 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [1980, -340],
+      "position": [
+        1980,
+        -340
+      ],
       "id": "5876cc79-4b51-45fc-a2e2-09e7742426c2",
       "name": "file diffs"
     },
@@ -169,7 +193,10 @@
       },
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
-      "position": [2140, -340],
+      "position": [
+        2140,
+        -340
+      ],
       "id": "17139c99-5cce-4283-8bac-262553a2022d",
       "name": "Filter"
     },
@@ -181,7 +208,10 @@
       },
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [2380, -340],
+      "position": [
+        2380,
+        -340
+      ],
       "id": "e60c8116-17fb-48ae-b431-0a6cc82bbccf",
       "name": "Loop Over Items"
     },
@@ -198,7 +228,10 @@
       },
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [-320, -260],
+      "position": [
+        -320,
+        -260
+      ],
       "id": "4e46964b-ee8c-4bd6-9943-a6d836385d15",
       "name": "Schedule Trigger"
     },
@@ -211,7 +244,10 @@
       },
       "type": "n8n-nodes-base.git",
       "typeVersion": 1,
-      "position": [400, -560],
+      "position": [
+        400,
+        -560
+      ],
       "id": "6ee45104-23c3-453b-8530-6b3bdfa492be",
       "name": "Git Clone",
       "credentials": {
@@ -228,7 +264,10 @@
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [1500, -80],
+      "position": [
+        1500,
+        -80
+      ],
       "id": "a0ac90c0-fdcd-4dae-88b1-8c96c38490bf",
       "name": "Generate a Diff for the file",
       "onError": "continueRegularOutput"
@@ -273,7 +312,10 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [-100, -340],
+      "position": [
+        -100,
+        -340
+      ],
       "id": "23981c50-6cc7-4bb4-986d-3a84f801a0a8",
       "name": "WF Config"
     },
@@ -284,7 +326,10 @@
       },
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
-      "position": [40, -340],
+      "position": [
+        40,
+        -340
+      ],
       "id": "56af38cd-9f5e-485f-85b5-68f2beba7578",
       "name": "Local Repo Exists",
       "alwaysOutputData": true
@@ -297,7 +342,10 @@
       },
       "type": "n8n-nodes-base.git",
       "typeVersion": 1,
-      "position": [2660, -300],
+      "position": [
+        2660,
+        -300
+      ],
       "id": "20550f6e-48f0-4af7-b151-bc5994421faf",
       "name": "Git Add File",
       "executeOnce": false
@@ -311,7 +359,10 @@
       },
       "type": "n8n-nodes-base.git",
       "typeVersion": 1,
-      "position": [3420, -500],
+      "position": [
+        3420,
+        -500
+      ],
       "id": "7eae92c5-09af-40e6-a557-cb5ded2e16a6",
       "name": "Git Push",
       "executeOnce": true,
@@ -333,7 +384,10 @@
       },
       "type": "n8n-nodes-base.git",
       "typeVersion": 1,
-      "position": [3600, -180],
+      "position": [
+        3600,
+        -180
+      ],
       "id": "93a59219-fccd-46e6-bc31-bd9f7e064447",
       "name": "Git Commit Files"
     },
@@ -343,7 +397,10 @@
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [1020, -360],
+      "position": [
+        1020,
+        -360
+      ],
       "id": "e191b3a3-508e-4b33-a80a-4eec7ac7d62a",
       "name": "Get Current Files"
     },
@@ -353,7 +410,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1960, -680],
+      "position": [
+        1960,
+        -680
+      ],
       "id": "ac5aa954-5ea1-413e-b8c7-2f395d3db088",
       "name": "New and Deleted WF"
     },
@@ -416,7 +476,10 @@
       },
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
-      "position": [2140, -680],
+      "position": [
+        2140,
+        -680
+      ],
       "id": "aee5b4df-abee-4721-a62e-59f489a2d92c",
       "name": "Switch"
     },
@@ -427,7 +490,10 @@
       },
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
-      "position": [2360, -860],
+      "position": [
+        2360,
+        -860
+      ],
       "id": "58cffdb3-6ba3-47c2-a2b2-eb630c7746fb",
       "name": "Split Out"
     },
@@ -439,7 +505,10 @@
       },
       "type": "n8n-nodes-base.git",
       "typeVersion": 1,
-      "position": [2560, -860],
+      "position": [
+        2560,
+        -860
+      ],
       "id": "64e809fc-6142-493b-9909-5dac7487e299",
       "name": "Git Add"
     },
@@ -452,7 +521,10 @@
       },
       "type": "n8n-nodes-base.git",
       "typeVersion": 1,
-      "position": [2780, -860],
+      "position": [
+        2780,
+        -860
+      ],
       "id": "cd459367-936e-486f-9cb1-04d050230c8d",
       "name": "Git Commit"
     },
@@ -462,7 +534,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.1,
-      "position": [3140, -500],
+      "position": [
+        3140,
+        -500
+      ],
       "id": "a495b21d-d75c-42d9-a0ee-191f6f6442c7",
       "name": "Merge1"
     },
@@ -473,7 +548,10 @@
       },
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
-      "position": [2360, -680],
+      "position": [
+        2360,
+        -680
+      ],
       "id": "ea1f68c6-c1b5-4f2d-b3a1-753ac156917a",
       "name": "Split Out1"
     },
@@ -486,7 +564,10 @@
       },
       "type": "n8n-nodes-base.git",
       "typeVersion": 1,
-      "position": [2780, -680],
+      "position": [
+        2780,
+        -680
+      ],
       "id": "97a22c60-f428-4eb0-baf8-d69f61bb5ae0",
       "name": "Git"
     },
@@ -496,7 +577,10 @@
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [2560, -680],
+      "position": [
+        2560,
+        -680
+      ],
       "id": "de6ea656-138d-4604-8856-4119da70d5a1",
       "name": "Git rm deleted wf"
     },
@@ -513,7 +597,10 @@
       },
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
-      "position": [1100, -80],
+      "position": [
+        1100,
+        -80
+      ],
       "id": "4c5a0f0f-83f7-4a42-bc59-9b4acfa88f74",
       "name": "Convert WF to File"
     },
@@ -551,7 +638,10 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [2840, -300],
+      "position": [
+        2840,
+        -300
+      ],
       "id": "247e46da-1bab-4d7f-a7e6-b6e45dcfdb74",
       "name": "Set ollama json"
     },
@@ -568,17 +658,23 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [3360, -300],
+      "position": [
+        3360,
+        -300
+      ],
       "id": "d44031e7-6f2e-4c70-b7ba-e759cee2ca90",
       "name": "Local AI Agent"
     },
     {
       "parameters": {
-        "command": "=cat > \"{{ $('WF Config').item.json.filterjsondiff }}\" << 'EOF'\n#!/usr/bin/env node\n\nconst fs = require('fs');\nconst path = process.argv[2];\n\nlet content = fs.readFileSync(path, 'utf8');\n\n// Remove createdAt/updatedAt timestamps\ncontent = content.replace(/\"createdAt\":\\s*\"[^\"]*\"/g, '\"createdAt\": \"REMOVED\"');\ncontent = content.replace(/\"updatedAt\":\\s*\"[^\"]*\"/g, '\"updatedAt\": \"REMOVED\"');\n\n// Remove position values\ncontent = content.replace(/\"position\":\\s*\\[\\s*-?\\d+\\s*,\\s*-?\\d+\\s*\\]/g, '\"position\": [0,0]');\n\n// Standardize version IDs\ncontent = content.replace(/\"versionId\":\\s*\"[^\"]*\"/g, '\"versionId\": \"REMOVED\"');\n\nprocess.stdout.write(content);\nEOF\n\n# Make the script executable\nchmod +x \"{{ $('WF Config').item.json.filterjsondiff }}\";\n\ncat > \"{{ $('WF Config').item.json.localpath }}/.gitattributes\" << 'EOF'\n*.json diff=n8njson\nEOF\n\ncd {{ $('WF Config').item.json.localpath }};\ngit config --local diff.n8njson.textconv \"{{ $('WF Config').item.json.filterjsondiff }}\";\n\n\n"
+        "command": "=cat > \"{{ $('WF Config').item.json.filterjsondiff }}\" << 'EOF'\n#!/usr/bin/env node\n\nconst fs = require('fs');\nconst path = process.argv[2];\n\nlet content = fs.readFileSync(path, 'utf8');\n\n// Remove createdAt/updatedAt timestamps\ncontent = content.replace(/\"createdAt\":\\s*\"[^\"]*\"/g, '\"createdAt\": \"REMOVED\"');\ncontent = content.replace(/\"updatedAt\":\\s*\"[^\"]*\"/g, '\"updatedAt\": \"REMOVED\"');\n\n// Remove position values\ncontent = content.replace(/\"position\":\\s*\\[\\s*-?\\d+\\s*,\\s*-?\\d+\\s*\\]/g, '\"position\": [0,0]');\n\n// Standardize version IDs\ncontent = content.replace(/\"versionId\":\\s*\"[^\"]*\"/g, '\"versionId\": \"REMOVED\"');\n\n// Remove staticData block\ncontent = content.replace(/,\\s*\"staticData\"\\s*:\\s*{[^}]*}/g, '');\n\nprocess.stdout.write(content);\nEOF\n\n# Make the script executable\nchmod +x \"{{ $('WF Config').item.json.filterjsondiff }}\";\n\ncat > \"{{ $('WF Config').item.json.localpath }}/.gitattributes\" << 'EOF'\n*.json diff=n8njson\nEOF\n\ncd {{ $('WF Config').item.json.localpath }};\ngit config --local diff.n8njson.textconv \"{{ $('WF Config').item.json.filterjsondiff }}\";\n\n\n"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [760, -560],
+      "position": [
+        760,
+        -560
+      ],
       "id": "531c7bee-2527-41e4-80cd-e1f1162a64d9",
       "name": "create json diff filter"
     },
@@ -589,7 +685,10 @@
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [560, -560],
+      "position": [
+        560,
+        -560
+      ],
       "id": "64d50a87-24ed-4002-91e3-95c7efb2dee0",
       "name": "Set Config"
     }
