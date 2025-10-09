@@ -1,0 +1,902 @@
+{
+  "name": "Karakeep",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "newkk",
+        "authentication": "headerAuth",
+        "options": {
+          "allowedOrigins": ""
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -6016,
+        288
+      ],
+      "id": "8c6524d8-fbe0-4b95-bfc9-49d6cfc862ff",
+      "name": "Webhook",
+      "webhookId": "16a0b63c-2487-4744-84ff-8e809bd6f6dd",
+      "notesInFlow": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "0X50DwgQIUGIatV",
+          "name": "main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek-v3.1:671b",
+        "options": {
+          "numCtx": 50000,
+          "numPredict": 25000,
+          "format": "json"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        -2272,
+        784
+      ],
+      "id": "362ed229-afc7-430a-b339-fc90091f632e",
+      "name": "Ollama Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "9eHVeIEp7poNm5",
+          "name": "Ollama"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"summary\": {\n            \"type\": \"string\"\n        },\n        \"quotes\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"string\"\n            }\n        },\n        \"tags_suggested\": {\n            \"type\": \"string\"\n        },\n        \"tags_normalized\": {\n            \"type\": \"string\"\n        },\n        \"mapping\": {\n            \"type\": \"object\",\n            \"properties\": {\n                \"from\": {\n                    \"type\": \"string\"\n                },\n                \"to\": {\n                    \"type\": \"string\"\n                },\n                \"reason\": {\n                    \"type\": \"string\"\n                }\n            }\n        }\n    }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -2128,
+        784
+      ],
+      "id": "f96ed9ff-2520-4ac3-b66c-bbe0d268ffd1",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Set the Settings').item.json['AI Prompt'].replace(\"[[textcontent]]\", $('Set the Settings').item.json.PageContent).replace(\"[[taglist]]\", $('Set the Settings').item.json['ExistingTags']) }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -2272,
+        560
+      ],
+      "id": "4f472dd3-10d2-4fdd-a06d-bc2bc2661d13",
+      "name": "Basic LLM Chain2",
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "maxTries": 4,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Set the Settings').item.json.IsYoutubeLink.toBoolean() }}",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "5922b65d-2964-45c2-8df6-8b5b58579e02"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Youtube"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.IsImage }}",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "3d64447b-4c44-40d7-9fbe-447fc461d8b8",
+                    "rightValue": "true"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "07d25511-511f-47ac-8116-826f1e820d3b",
+                    "leftValue": "={{ $('Set the Settings').item.json.AssetType }} ",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "imageasset"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c220f370-8be0-4d95-96d8-e7723aafd1d0",
+                    "leftValue": "={{ $('Set the Settings').item.json.ContentType }}",
+                    "rightValue": "asset",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "asset"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "17f9ccaf-d5ea-4e0a-a7b6-54ce096ae9ff",
+                    "leftValue": "={{ $('Set the Settings').item.json.ContentType }}",
+                    "rightValue": "link",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "link"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none",
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -3040,
+        224
+      ],
+      "id": "5533314a-ac27-48e2-b601-7af68918f3f3",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "afbafcea-eea8-4f3c-85f2-d898b2b0f45f",
+              "name": "AI Prompt",
+              "value": "=You are given:\\n\\t1.\\tThe full text of an article to summarize.\\n    2.\\tA master list of existing tags that should be preferred when close matches exist.\\n\\nYour goals:\\n\\t•\\tProduce a concise, useful summary of the article.\\n•\\tAfter the summary, provide three quotes from the article that would be good to share.\\n\\t•\\tPropose a small set of descriptive tags (typically 5–10) that help retrieval.\\n\\t•\\tNormalize suggested tags to the closest existing tags when applicable.\\n\\t•\\tAvoid over-tagging and redundancy. Prefer broader, high-signal tags over very narrow, one-off tags unless essential.\\n\\nContent quality rules:\\n\\t•\\tSummary should be 3–6 sentences, factual, neutral, and faithful to the source. Avoid marketing tone. Avoid quotes unless essential.\\n\\t•\\tInclude key who/what/why/how and concrete outcomes or recommendations if present.\\n\\t•\\tIf article is highly technical, prefer clarity over jargon; define terms briefly if needed.\\n\\nTagging rules:\\n\\t•\\tStart from the article’s core topics, entities, actions, and outcomes.\\n\\t•\\tInclude up to 1–2 proper nouns (e.g., organizations, products) only if central.\\n    •\\tPrefer nouns and noun phrases; avoid overly generic tags like 'news' or 'update.'\\n    •\\tUse existing tags when they are close matches (case-insensitive, trim punctuation, singularize). Consider semantic closeness, not just exact string match.\\n    •\\tIf no close existing tag fits, create a new tag that is concise (1–3 words), lowercased, singular form, and reusable beyond this single article.\\n    •\\tAim for 5–20 total tags maximum. Do not include near-duplicates.\\n    •\\tIf two tags overlap, keep the more general, widely reusable one unless the specific one is essential for precision.\\n\\nNormalization guidance:\\n\\t•\\tSingularize plurals (e.g., 'databases' → 'database') unless the existing tag list uses a fixed plural.\\n    •\\tUse American English spellings if variants exist, unless the existing tag list uses a different standard.\\n   \\t•\\tMap synonyms to existing tags (e.g., 'gen ai,' 'generative ai,' 'gpt' → 'generative ai' if present).\\n   \\t•\\tMerge hyphenation variants to the existing form (e.g., 'e-commerce' → 'ecommerce' if that’s the existing tag).\\n   \\t•\\tFor multiword tags, use spaces (not slashes or commas) unless the existing tag uses a different convention.\\n\\nOutput format:\\nReturn a JSON object with exactly these keys:\\n\\t•\\tsummary: string\\n   \\t•\\quotes: array of strings \\n   \\t•\\ttags_suggested: comma separated list of strings (your initial suggestions before normalization)\\n   \\t•\\ttags_normalized: comma separated list of strings (final tags after mapping to existing tags)\\n   \\t•\\tmapping: array of objects with keys:\\n\\t  ▪\\tfrom: string (suggested tag)\\n      ▪\\tto: string (final chosen existing tag or new tag identical to 'from' if no match) \\t\\n      ▪\\treason: string (brief rationale for choice)\\n\\nImportant:\\n\\t•\\tDo not include any text outside the JSON.\\n   \\t•\\tIf the article is missing or empty, set summary to an empty string and return empty arrays for tags.\\n   \\t•\\tIf you are uncertain between two existing tags, select the more general tag and note the decision in the mapping reason.\\n\\nInputs:\\n\\t•\\tContent: \\n[[textcontent]]\\n\\n  •\\tExisting tags:\\n[[taglist]]\\n\\nMatching guidance (examples—adapt to your tag list):\\n\\t•\\tcloud computing ~ cloud, cloud infrastructure, aws, azure, gcp\\n   \\t•\\tlarge language models ~ llm, language models\\n   \\t•\\tuser experience ~ ux\\n   \\t•\\tsearch engine optimization ~ seo\\n   \\t•\\tdata visualization ~ dataviz, data viz\\n   \\t•\\tmachine learning operations ~ mlops\\n\\nNow perform the task.",
+              "type": "string"
+            },
+            {
+              "id": "6f0dc42e-ca73-423e-acdc-cf9ecdda4e70",
+              "name": "BookmarkID",
+              "value": "={{ $('Webhook').item.json.body.bookmarkId }}",
+              "type": "string"
+            },
+            {
+              "id": "01c8841c-d24d-4edc-b1ca-33accb57f3b7",
+              "name": "UserID",
+              "value": "={{ $('Webhook').item.json.body.userId || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "663cef98-c112-4d9b-a126-4166309a2cc8",
+              "name": "Content",
+              "value": "={{ $('Webhook').item.json.body.url || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f4f8296f-000c-4723-8039-edff5b7e7499",
+              "name": "ContentType",
+              "value": "={{ $('Webhook').item.json.body.type  || \"none\"}}",
+              "type": "string"
+            },
+            {
+              "id": "05bd506c-6584-4d5d-9d54-c8b094159072",
+              "name": "ExistingTags",
+              "value": "={{ $('Get all the tags').item.json.tags || \"\"}}",
+              "type": "string"
+            },
+            {
+              "id": "f3d8166a-2467-4f24-9f9d-9bb5dce23fb0",
+              "name": "IsYoutubeLink",
+              "value": "={{ (() => { const u = String($('Webhook').item.json.body?.url || '').trim(); return /^(https?:\\/\\/)?(www\\.)?(m\\.)?(youtube\\.com|youtu\\.be)\\//i.test(u); })() || false}}",
+              "type": "boolean"
+            },
+            {
+              "id": "17b2477e-0f46-4863-ac3e-080d9d07e574",
+              "name": "IsImage",
+              "value": "={{ (() => { const u = String($('Webhook').item.json.body?.url || '').trim(); if (!u) return false; if (/\\.(png|jpe?g|gif|webp|bmp|svg|tiff?)(?:\\?.*)?$/i.test(u)) return true; if (/\\b(?:format|fm)=(png|jpe?g|jpg|gif|webp|bmp|svg|tiff?)\\b/i.test(u)) return true; return false; })() || $('Get the full bookmark').item.json.content.assetType === \"image\"  }}",
+              "type": "boolean"
+            },
+            {
+              "id": "42f8eda9-6ec4-4b92-9cd9-ae612bd9707a",
+              "name": "AssetType",
+              "value": "={{ $('Get the full bookmark').item.json.content.assetType || \"none\" }}",
+              "type": "string"
+            },
+            {
+              "id": "c55931a7-c828-4d6f-b22c-1d4828dcce64",
+              "name": "PageContent",
+              "value": "={{(()=>{\n  let pagecontent=$('Get the full bookmark').item.json.content.htmlContent\n  \n  return pagecontent\n})()}}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3504,
+        272
+      ],
+      "id": "bc8e7773-4fd5-4f71-a6e5-c078e18a6f1b",
+      "name": "Set the Settings",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dc6676a4-6798-4385-93f3-480c3de60198",
+              "leftValue": "={{ $('Get the full bookmark').item.json.content.crawledAt }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b077a2bd-4efe-4a4a-95b2-083b7b9f5e7e",
+              "leftValue": "={{ $('Get the full bookmark').item.json.content.assetType }}",
+              "rightValue": "image",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "deda4603-9cb4-4efe-9081-33d5762521a0",
+              "leftValue": "={{ $('Get row(s)').item.json.run }}",
+              "rightValue": 20,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5024,
+        288
+      ],
+      "id": "67a6ae3f-0689-417e-9a76-9e4a9b03ccfb",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -4832,
+        336
+      ],
+      "id": "290fa26a-7b61-4728-9103-126c70c814e2",
+      "name": "Wait",
+      "webhookId": "7aed69e0-e06c-4277-b074-e3f9f58d0569"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a5db8f71-952c-41f7-b5d3-4f93a7f2c4c6",
+              "name": "bid",
+              "value": "={{ $('Webhook').item.json.body.bookmarkId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -5648,
+        288
+      ],
+      "id": "51104ffa-7d2c-47b1-a3b4-1d89bb457505",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a3120792-3a65-4eb5-bf3c-bbc3ea40bb9c",
+              "name": "bid",
+              "value": "={{ $('Get the full bookmark').item.json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4512,
+        336
+      ],
+      "id": "763cbaeb-0787-4f71-804f-d62ce302b35d",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "CNkf9OcEeZOb5MsD",
+          "mode": "list",
+          "cachedResultName": "loopruns",
+          "cachedResultUrl": "/projects/nAatdPScyL6dMXc/datatables/CNkf9OcEeZb5MsD"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "loopid",
+              "keyValue": "={{ $execution.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "loopid": "={{ $execution.id }}",
+            "run": "={{ $('Get row(s)').item.json.run + 1 }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "loopid",
+              "displayName": "loopid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "run",
+              "displayName": "run",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -4672,
+        336
+      ],
+      "id": "bdf163a1-86ff-4906-8b55-862bb619f612",
+      "name": "Upsert row(s)"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "CNkf9OcEeZOb5MsD",
+          "mode": "list",
+          "cachedResultName": "loopruns",
+          "cachedResultUrl": "/projects/nAatdPScymL6dMXc/datatables/CNkf9OcEeZOb5MsD"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "loopid",
+              "keyValue": "={{ $execution.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -5200,
+        288
+      ],
+      "id": "6f60cfe3-d34c-4093-8d2d-d74d1e93ea80",
+      "name": "Get row(s)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "CNkf9OcEeZOb5MsD",
+          "mode": "list",
+          "cachedResultName": "loopruns",
+          "cachedResultUrl": "/projects/nAatdPSymL6dMXc/datatables/CNkf9OcEZOb5MsD"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "loopid",
+              "keyValue": "={{ $execution.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -4000,
+        272
+      ],
+      "id": "0c56e68e-1860-40ac-be8f-24250fa3b608",
+      "name": "Delete row(s)"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "CNkf9OcEeZOb5MsD",
+          "mode": "list",
+          "cachedResultName": "loopruns",
+          "cachedResultUrl": "/projects/nAatdPScymL6dMXc/datatables/CNkf9OcEeZOb5MsD"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "loopid": "={{ $execution.id }}",
+            "run": 1
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "loopid",
+              "displayName": "loopid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "run",
+              "displayName": "run",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -5840,
+        288
+      ],
+      "id": "9ca0eb8d-6d90-44e4-b529-6b3ac1414a88",
+      "name": "Initialize Loop Runs"
+    },
+    {
+      "parameters": {
+        "url": "=https://mykarakeepserver/api/v1/bookmarks/{{ $json.bid }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -5408,
+        288
+      ],
+      "id": "abe415c6-b321-4429-8b42-a53be8052540",
+      "name": "Get the full bookmark",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "gtuPf378nBI71Oce",
+          "name": "karakeep"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://mykarakeepserver/api/v1/tags",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3792,
+        272
+      ],
+      "id": "0dcae5ef-e3b0-4321-9750-818cb72e627a",
+      "name": "Get all the tags",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "gtuPf37BI71Oce",
+          "name": "karakeep"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://mykarakeepserver/api/v1/bookmarks/{{ $('Set the Settings').item.json.BookmarkID }}/tags",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {tags: $json.output.tags_normalized.split(',').map(t => ({tagId: t.trim(), tagName: t.trim()}))} }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1920,
+        560
+      ],
+      "id": "e823766a-739f-42e8-9e78-96ea31331788",
+      "name": "HTTP Request2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "gtuPf38nBI71Oce",
+          "name": "karakeep"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://mykarakeepserver/api/v1/bookmarks/{{ $('Set the Settings').item.json.BookmarkID }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \n  \"summary\": \"{{ $('Basic LLM Chain2').item.json.output.summary }}\\n\\nQuotable Quotes:\\n{{ $('Basic LLM Chain2').item.json.output.quotes.join(\"\\\\n\\\\n\").replaceAll(\"\\\"\", \"'\") }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1712,
+        560
+      ],
+      "id": "17fc3755-55f6-48b3-8cf9-ceda670e8782",
+      "name": "HTTP Request3",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "gtuPf3nBI71Oce",
+          "name": "karakeep"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Initialize Loop Runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set the Settings": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Upsert row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert row(s)": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete row(s)": {
+      "main": [
+        [
+          {
+            "node": "Get all the tags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initialize Loop Runs": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Get the full bookmark",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the full bookmark": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Get the full bookmark",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all the tags": {
+      "main": [
+        [
+          {
+            "node": "Set the Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8504c969-fbe2-41d4-b6e1-b0ba6abadf24",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c563fc7190a37860e3bcf3c23d0a244873cbf65952d435fff27d7581315c574b"
+  },
+  "id": "5Z6JMfftnWxI6aiF",
+  "tags": []
+}
