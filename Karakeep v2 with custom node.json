@@ -1,0 +1,508 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "crawled",
+        "authentication": "headerAuth",
+        "options": {
+          "allowedOrigins": ""
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1440,
+        16
+      ],
+      "id": "8384d490-35d8-4983-8e9f-7fbfd7123838",
+      "name": "Webhook",
+      "webhookId": "16a0b63c-2487-4744-84ff-8e809bd6f6dd",
+      "notesInFlow": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "0IH8gzZchVhPJomB",
+          "name": "Karakeep to n8n auth header"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek-v3.1:671b",
+        "options": {
+          "numCtx": 50000,
+          "numPredict": 25000,
+          "format": "json"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        304
+      ],
+      "id": "117edcc9-58af-498b-8158-11fef66e0a99",
+      "name": "Ollama Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "9eHVeICZEp7poNm5",
+          "name": "Ollama Cloud"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"summary\": {\n            \"type\": \"string\"\n        },\n        \"quotes\": {\n            \"type\": \"array\",\n            \"items\": {\n              \"type\": \"string\"\n            }\n        },\n        \"tags_suggested\": {\n            \"type\": \"string\"\n        },\n        \"tags_normalized\": {\n            \"type\": \"string\"\n        },\n        \"mapping\": {\n            \"type\": \"object\",\n            \"properties\": {\n                \"from\": {\n                    \"type\": \"string\"\n                },\n                \"to\": {\n                    \"type\": \"string\"\n                },\n                \"reason\": {\n                    \"type\": \"string\"\n                }\n            }\n        }\n    }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        304
+      ],
+      "id": "8ad94956-1965-4f9a-9b43-6a6ef4752642",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Set the Settings').item.json['AI Prompt'].replace(\"[[textcontent]]\", $('Set the Settings').item.json.PageContent).replace(\"[[taglist]]\", $('Set the Settings').item.json['ExistingTags']) }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -240,
+        80
+      ],
+      "id": "ec93cc0b-7eb6-4b05-9781-3faca75a51ef",
+      "name": "Basic LLM Chain2",
+      "retryOnFail": true,
+      "waitBetweenTries": 1500,
+      "maxTries": 4,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Set the Settings').item.json.IsYoutubeLink.toBoolean() }}",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "5922b65d-2964-45c2-8df6-8b5b58579e02"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Youtube"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.IsImage }}",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "3d64447b-4c44-40d7-9fbe-447fc461d8b8",
+                    "rightValue": "true"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "07d25511-511f-47ac-8116-826f1e820d3b",
+                    "leftValue": "={{ $('Set the Settings').item.json.AssetType }} ",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "imageasset"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c220f370-8be0-4d95-96d8-e7723aafd1d0",
+                    "leftValue": "={{ $('Set the Settings').item.json.ContentType }}",
+                    "rightValue": "asset",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "asset"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "17f9ccaf-d5ea-4e0a-a7b6-54ce096ae9ff",
+                    "leftValue": "={{ $('Set the Settings').item.json.ContentType }}",
+                    "rightValue": "link",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "link"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none",
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -512,
+        -32
+      ],
+      "id": "0d028099-cf48-45ab-9f5e-8800159000d4",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "afbafcea-eea8-4f3c-85f2-d898b2b0f45f",
+              "name": "AI Prompt",
+              "value": "=You are given:\\n\\t1.\\tThe full text of an article to summarize.\\n    2.\\tA master list of existing tags that should be preferred when close matches exist.\\n\\nYour goals:\\n\\t•\\tProduce a concise, useful summary of the article.\\n•\\tAfter the summary, provide three quotes from the article that would be good to share.\\n\\t•\\tPropose a small set of descriptive tags (typically 5–10) that help retrieval.\\n\\t•\\tNormalize suggested tags to the closest existing tags when applicable.\\n\\t•\\tAvoid over-tagging and redundancy. Prefer broader, high-signal tags over very narrow, one-off tags unless essential.\\n\\nContent quality rules:\\n\\t•\\tSummary should be 3–6 sentences, factual, neutral, and faithful to the source. Avoid marketing tone. Avoid quotes unless essential.\\n\\t•\\tInclude key who/what/why/how and concrete outcomes or recommendations if present.\\n\\t•\\tIf article is highly technical, prefer clarity over jargon; define terms briefly if needed.\\n\\nTagging rules:\\n\\t•\\tStart from the article’s core topics, entities, actions, and outcomes.\\n\\t•\\tInclude up to 1–2 proper nouns (e.g., organizations, products) only if central.\\n    •\\tPrefer nouns and noun phrases; avoid overly generic tags like 'news' or 'update.'\\n    •\\tUse existing tags when they are close matches (case-insensitive, trim punctuation, singularize). Consider semantic closeness, not just exact string match.\\n    •\\tIf no close existing tag fits, create a new tag that is concise (1–3 words), lowercased, singular form, and reusable beyond this single article.\\n    •\\tAim for 5–20 total tags maximum. Do not include near-duplicates.\\n    •\\tIf two tags overlap, keep the more general, widely reusable one unless the specific one is essential for precision.\\n\\nNormalization guidance:\\n\\t•\\tSingularize plurals (e.g., 'databases' → 'database') unless the existing tag list uses a fixed plural.\\n    •\\tUse American English spellings if variants exist, unless the existing tag list uses a different standard.\\n   \\t•\\tMap synonyms to existing tags (e.g., 'gen ai,' 'generative ai,' 'gpt' → 'generative ai' if present).\\n   \\t•\\tMerge hyphenation variants to the existing form (e.g., 'e-commerce' → 'ecommerce' if that’s the existing tag).\\n   \\t•\\tFor multiword tags, use spaces (not slashes or commas) unless the existing tag uses a different convention.\\n\\nOutput format:\\nReturn a JSON object with exactly these keys:\\n\\t•\\tsummary: string\\n   \\t•\\quotes: array of strings \\n   \\t•\\ttags_suggested: comma separated list of strings (your initial suggestions before normalization)\\n   \\t•\\ttags_normalized: comma separated list of strings (final tags after mapping to existing tags)\\n   \\t•\\tmapping: array of objects with keys:\\n\\t  ▪\\tfrom: string (suggested tag)\\n      ▪\\tto: string (final chosen existing tag or new tag identical to 'from' if no match) \\t\\n      ▪\\treason: string (brief rationale for choice)\\n\\nImportant:\\n\\t•\\tDo not include any text outside the JSON.\\n   \\t•\\tIf the article is missing or empty, set summary to an empty string and return empty arrays for tags.\\n   \\t•\\tIf you are uncertain between two existing tags, select the more general tag and note the decision in the mapping reason.\\n\\nInputs:\\n\\t•\\tContent: \\n[[textcontent]]\\n\\n  •\\tExisting tags:\\n[[taglist]]\\n\\nMatching guidance (examples—adapt to your tag list):\\n\\t•\\tcloud computing ~ cloud, cloud infrastructure, aws, azure, gcp\\n   \\t•\\tlarge language models ~ llm, language models\\n   \\t•\\tuser experience ~ ux\\n   \\t•\\tsearch engine optimization ~ seo\\n   \\t•\\tdata visualization ~ dataviz, data viz\\n   \\t•\\tmachine learning operations ~ mlops\\n\\nNow perform the task.",
+              "type": "string"
+            },
+            {
+              "id": "6f0dc42e-ca73-423e-acdc-cf9ecdda4e70",
+              "name": "BookmarkID",
+              "value": "={{ $('Webhook').item.json.body.bookmarkId }}",
+              "type": "string"
+            },
+            {
+              "id": "01c8841c-d24d-4edc-b1ca-33accb57f3b7",
+              "name": "UserID",
+              "value": "={{ $('Webhook').item.json.body.userId || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "663cef98-c112-4d9b-a126-4166309a2cc8",
+              "name": "Content",
+              "value": "={{ $('Webhook').item.json.body.url || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "f4f8296f-000c-4723-8039-edff5b7e7499",
+              "name": "ContentType",
+              "value": "={{ $('Webhook').item.json.body.type  || \"none\"}}",
+              "type": "string"
+            },
+            {
+              "id": "05bd506c-6584-4d5d-9d54-c8b094159072",
+              "name": "ExistingTags",
+              "value": "={{ $('Get many tags').item.json.tags || \"\"}}",
+              "type": "string"
+            },
+            {
+              "id": "f3d8166a-2467-4f24-9f9d-9bb5dce23fb0",
+              "name": "IsYoutubeLink",
+              "value": "={{ (() => { const u = String($('Webhook').item.json.body?.url || '').trim(); return /^(https?:\\/\\/)?(www\\.)?(m\\.)?(youtube\\.com|youtu\\.be)\\//i.test(u); })() || false}}",
+              "type": "boolean"
+            },
+            {
+              "id": "17b2477e-0f46-4863-ac3e-080d9d07e574",
+              "name": "IsImage",
+              "value": "={{ (() => { const u = String($('Webhook').item.json.body?.url || '').trim(); if (!u) return false; if (/\\.(png|jpe?g|gif|webp|bmp|svg|tiff?)(?:\\?.*)?$/i.test(u)) return true; if (/\\b(?:format|fm)=(png|jpe?g|jpg|gif|webp|bmp|svg|tiff?)\\b/i.test(u)) return true; return false; })() || $('Get the full bookmark').item.json.content.assetType === \"image\"  }}",
+              "type": "boolean"
+            },
+            {
+              "id": "42f8eda9-6ec4-4b92-9cd9-ae612bd9707a",
+              "name": "AssetType",
+              "value": "={{ $('Get the full bookmark').item.json.content.assetType || \"none\" }}",
+              "type": "string"
+            },
+            {
+              "id": "c55931a7-c828-4d6f-b22c-1d4828dcce64",
+              "name": "PageContent",
+              "value": "={{ $json.content.htmlContent }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -736,
+        16
+      ],
+      "id": "bf5a557a-3ebe-481d-bba8-fee875cad9b6",
+      "name": "Set the Settings",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "resource": "tags",
+        "outputFormat": "names",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [
+        -1216,
+        16
+      ],
+      "id": "2aa0acfd-d057-48d6-9f49-41600bba9c4c",
+      "name": "Get many tags",
+      "credentials": {
+        "karakeepApi": {
+          "id": "2W20p4iunAfkt0Sd",
+          "name": "Karakeep account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getById",
+        "bookmarkId": "={{ $('Webhook').item.json.body.bookmarkId }}"
+      },
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [
+        -1008,
+        16
+      ],
+      "id": "02924489-86a9-40ea-88c6-de79520a2a75",
+      "name": "Get the full bookmark",
+      "credentials": {
+        "karakeepApi": {
+          "id": "2W20p4iunAfkt0Sd",
+          "name": "Karakeep account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "manageTags",
+        "bookmarkId": "={{ $('Webhook').item.json.body.bookmarkId }}",
+        "tagsToManage": "={{ $json.output.tags_normalized }}"
+      },
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [
+        112,
+        80
+      ],
+      "id": "8640d4b9-417a-42de-843b-15f0901ac363",
+      "name": "Manage bookmark tags",
+      "credentials": {
+        "karakeepApi": {
+          "id": "2W20p4iunAfkt0Sd",
+          "name": "Karakeep account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "bookmarkId": "={{ $('Set the Settings').item.json.BookmarkID }}",
+        "summary": "={{ $('Basic LLM Chain2').item.json.output.summary }}\n\nInteresting Quotes:\n{{ $('Basic LLM Chain2').item.json.output.quotes.join('\\n\\n') }}"
+      },
+      "type": "n8n-nodes-karakeep.karakeep",
+      "typeVersion": 1,
+      "position": [
+        320,
+        80
+      ],
+      "id": "2d411fba-51c8-490f-be30-159e0c6f17f6",
+      "name": "Update a bookmark",
+      "credentials": {
+        "karakeepApi": {
+          "id": "2W20p4iunAfkt0Sd",
+          "name": "Karakeep account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get many tags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain2": {
+      "main": [
+        [
+          {
+            "node": "Manage bookmark tags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [],
+        [],
+        [],
+        [],
+        [
+          {
+            "node": "Basic LLM Chain2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set the Settings": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many tags": {
+      "main": [
+        [
+          {
+            "node": "Get the full bookmark",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the full bookmark": {
+      "main": [
+        [
+          {
+            "node": "Set the Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manage bookmark tags": {
+      "main": [
+        [
+          {
+            "node": "Update a bookmark",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a bookmark": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c563fc7190a37860e3bcf3c23d0a244873cbf65952d435fff27d7581315c574b"
+  }
+}
